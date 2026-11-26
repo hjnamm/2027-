@@ -29,6 +29,17 @@ interface StoredRecord {
 
 const STORAGE_KEY = 'wish-stone-tower-records-v1';
 
+/** GA4 이벤트 전송 (gtag가 없으면 조용히 넘어감) */
+function trackEvent(name: string, params: Record<string, unknown> = {}) {
+  try {
+    const g = (window as unknown as { gtag?: (...args: unknown[]) => void }).gtag;
+    if (typeof g === 'function') g('event', name, params);
+  } catch {
+    // 무시
+  }
+}
+
+
 const DEFAULT_RECORD: StoredRecord = {
   bestHeightCm: 0,
   bestHeightLabel: '0.00m',
@@ -112,6 +123,7 @@ export default function App() {
 
   const handleStartGame = useCallback(() => {
     soundEngine.unlock();
+    trackEvent('game_start');
     setLastResult(null);
     setIsNewBest(false);
     setMode('playing');
@@ -120,6 +132,7 @@ export default function App() {
 
   const handleBackToTitle = useCallback(() => {
     setLastResult(null);
+    trackEvent('back_to_title');
     setIsNewBest(false);
     setMode('title');
     setRunKey((k) => k + 1);
@@ -137,6 +150,11 @@ export default function App() {
     (result: StoneTowerRunResult) => {
       setLastResult(result);
       setMode('gameover');
+      trackEvent('game_over', {
+        height_cm: result.heightCm,
+        layers: result.layers,
+        end_reason: (result as unknown as { endReason?: string }).endReason ?? 'unknown',
+      });
 
       setRecord((prev) => {
         const beatBest = result.heightCm > prev.bestHeightCm;
