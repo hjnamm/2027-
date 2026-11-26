@@ -1,0 +1,6 @@
+{
+  "name": "소원돌탑",
+  "description": "산사 연못가에서 돌의 균형을 잡으며 높이 쌓아 올리는 물리 돌탑 쌓기 게임",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
